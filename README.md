@@ -1,2 +1,2 @@
-# bet-filter-bot
+bbrsport-telegram-bot
 Bet Analyzer
