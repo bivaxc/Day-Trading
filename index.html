@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Floor Bounce Calculator</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Floor Bounce">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{
+  --bg:#F3F6FB;--card:#FFFFFF;--ink:#0B2545;--mute:#5B6677;--line:#CBD5E4;
+  --blue:#2F6FDE;--green:#177E4A;--red:#C23B3B;--gold:#B7791F;--field:#F7F9FD;
+  --okbg:#E6F5EC;--badbg:#FDECEC;--warnbg:#FFF6DD;color-scheme:light;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1424;--card:#12203A;--ink:#E8EEFA;--mute:#9AA8C2;--line:#27395C;
+  --blue:#6FA0FF;--green:#4FD08A;--red:#FF7A7A;--gold:#F0B94A;--field:#0E1A31;
+  --okbg:#10321F;--badbg:#3A1717;--warnbg:#3A2E10;color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0A1424;--card:#12203A;--ink:#E8EEFA;--mute:#9AA8C2;--line:#27395C;
+  --blue:#6FA0FF;--green:#4FD08A;--red:#FF7A7A;--gold:#F0B94A;--field:#0E1A31;
+  --okbg:#10321F;--badbg:#3A1717;--warnbg:#3A2E10;color-scheme:dark;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mute);margin:0 0 18px;font-size:.95rem}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+h2{font-size:1.05rem;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:.85rem;color:var(--mute);margin-bottom:4px}
+input,select{width:100%;font:inherit;font-size:1.05rem;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:10px 11px;min-height:44px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.full{grid-column:1/-1}
+.hint{font-size:.8rem;color:var(--mute);margin-top:4px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;font:inherit;font-weight:600;padding:10px;min-height:44px;border:0;background:var(--field);color:var(--mute);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row span:first-child{color:var(--mute)}
+.row b{text-align:right}
+.big{font-size:1.25rem}
+.pos{color:var(--green)}.neg{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th{text-align:left;color:var(--mute);font-weight:500;padding:6px 4px;border-bottom:1px solid var(--line)}
+td{padding:9px 4px;border-bottom:1px solid var(--line)}
+td:not(:first-child),th:not(:first-child){text-align:right}
+tr:last-child td{border-bottom:0}
+.wrap{overflow-x:auto}
+.note{border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.92rem}
+.ok{background:var(--okbg)}.bad{background:var(--badbg)}.warn{background:var(--warnbg)}
+.empty{color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+<h1>Floor Bounce calculator</h1>
+<p class="sub">Work out the stop loss, take profits and the cost of a trade before you enter. Nothing is saved.</p>
+
+<section aria-labelledby="h-in">
+  <h2 id="h-in">Your trade</h2>
+  <div class="grid">
+    <div class="full">
+      <label>Market</label>
+      <div class="seg" id="mk"><button type="button" data-v="USOIL" aria-pressed="true">USOIL</button><button type="button" data-v="UKOIL" aria-pressed="false">UKOIL</button></div>
+    </div>
+    <div class="full">
+      <label>Direction</label>
+      <div class="seg" id="dr"><button type="button" data-v="buy" aria-pressed="true">Buy</button><button type="button" data-v="sell" aria-pressed="false">Sell</button></div>
+    </div>
+    <div>
+      <label for="bal">Trading balance (UGX)</label>
+      <input id="bal" inputmode="decimal" placeholder="Enter yours">
+    </div>
+    <div>
+      <label for="risk">Risk per trade (%)</label>
+      <input id="risk" inputmode="decimal" value="2">
+    </div>
+    <div class="full">
+      <label for="ugx">UGX per 1.00 price move at 0.01 lot</label>
+      <input id="ugx" inputmode="decimal">
+      <div class="hint" id="ugxh"></div>
+    </div>
+    <div>
+      <label for="entry">Entry price</label>
+      <input id="entry" inputmode="decimal" placeholder="e.g. 97.155">
+    </div>
+    <div>
+      <label for="floor" id="floorL">Floor price</label>
+      <input id="floor" inputmode="decimal" placeholder="e.g. 96.616">
+    </div>
+    <div>
+      <label for="buf">Stop buffer (price)</label>
+      <input id="buf" inputmode="decimal" value="0.15">
+    </div>
+    <div>
+      <label for="tp1">Take profit 1</label>
+      <input id="tp1" inputmode="decimal" placeholder="e.g. 97.731">
+    </div>
+    <div class="full">
+      <label for="tp2">Take profit 2 (optional)</label>
+      <input id="tp2" inputmode="decimal" placeholder="e.g. 98.010">
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-stop">
+  <h2 id="h-stop">Stop loss</h2>
+  <div id="stopOut" class="empty">Enter your entry and floor to see the stop.</div>
+</section>
+
+<section aria-labelledby="h-tp">
+  <h2 id="h-tp">Take profit</h2>
+  <div class="wrap" id="tpOut"><span class="empty">Enter a take profit price.</span></div>
+</section>
+
+<section aria-labelledby="h-fit">
+  <h2 id="h-fit">Your risk limit</h2>
+  <div id="fitOut" class="empty">Enter your balance to see the limit.</div>
+</section>
+
+<section aria-labelledby="h-rr">
+  <h2 id="h-rr">Targets for a set reward</h2>
+  <div class="wrap" id="rrOut"><span class="empty">Shown once the stop is set.</span></div>
+</section>
+
+<section aria-labelledby="h-v">
+  <h2 id="h-v">Check</h2>
+  <div id="verdict" class="empty">Fill in the trade to see the checks.</div>
+</section>
+</main>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var state={mk:'USOIL',dr:'buy'};
+  var ugxStore={USOIL:'41600',UKOIL:''};
+  var hints={
+    USOIL:'Estimated from your open USOIL trade (loss divided by price move). Recheck every week or two.',
+    UKOIL:'Not verified yet. Check the contract size in MT5, or divide profit by price move on a live trade.'
+  };
+  function num(id){var v=parseFloat(($(id).value||'').replace(/,/g,''));return isNaN(v)?null:v}
+  function u(n){return Math.round(n).toLocaleString('en-US')}
+  function p(n){return n.toFixed(3)}
+  function row(a,b,c){return '<div class="row"><span>'+a+'</span><b'+(c?' class="'+c+'"':'')+'>'+b+'</b></div>'}
+  function note(t,c){return '<div class="note '+c+'">'+t+'</div>'}
+
+  function seg(id,key,after){
+    $(id).addEventListener('click',function(e){
+      var b=e.target.closest('button');if(!b)return;
+      if(key==='mk'){ugxStore[state.mk]=$('ugx').value;}
+      state[key]=b.getAttribute('data-v');
+      Array.prototype.forEach.call($(id).children,function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+      after();calc();
+    });
+  }
+  function loadMarket(){$('ugx').value=ugxStore[state.mk];$('ugxh').textContent=hints[state.mk]}
+  function loadDir(){$('floorL').textContent=state.dr==='buy'?'Floor price':'Ceiling price'}
+  seg('mk','mk',loadMarket);seg('dr','dr',loadDir);
+  loadMarket();loadDir();
+
+  function calc(){
+    var d=state.dr==='buy'?1:-1;
+    var bal=num('bal'),rk=num('risk'),ugx=num('ugx'),en=num('entry'),fl=num('floor'),bf=num('buf'),t1=num('tp1'),t2=num('tp2');
+    var notes=[];
+    var stop=null,rd=null,loss=null;
+    if(en!==null&&fl!==null&&bf!==null){
+      stop=fl-d*bf; rd=(en-stop)*d;
+    }
+    // stop
+    if(stop===null){
+      $('stopOut').className='empty';$('stopOut').textContent='Enter your entry and floor to see the stop.';
+    }else if(rd<=0){
+      $('stopOut').className='';
+      $('stopOut').innerHTML=note('The stop at '+p(stop)+' is on the wrong side of your entry. For a '+state.dr+', the '+(d===1?'floor':'ceiling')+' must be '+(d===1?'below':'above')+' your entry.','bad');
+      rd=null;
+    }else{
+      $('stopOut').className='';
+      var h=row('Stop loss price',p(stop),'big')+row('Stop distance from entry',p(rd));
+      if(ugx!==null){loss=rd*ugx;h+=row('Loss if stopped',u(loss)+' UGX','neg');
+        if(bal){h+=row('Share of your balance',(loss/bal*100).toFixed(1)+'%','neg')}}
+      else h+=row('Loss if stopped','Enter UGX per 1.00 move');
+      $('stopOut').innerHTML=h;
+    }
+    // take profit
+    var tps=[['Take profit 1',t1],['Take profit 2',t2]].filter(function(x){return x[1]!==null});
+    if(!tps.length||en===null){
+      $('tpOut').innerHTML='<span class="empty">Enter an entry and a take profit price.</span>';
+    }else{
+      var t='<table><tr><th></th><th>Price</th><th>Move</th><th>Profit</th><th>Reward : risk</th></tr>';
+      tps.forEach(function(x){
+        var dist=(x[1]-en)*d;
+        if(dist<=0){t+='<tr><td>'+x[0]+'</td><td colspan="4" class="neg">Wrong side of entry</td></tr>';notes.push(note(x[0]+' is on the wrong side of your entry.','bad'));return}
+        var pr=ugx!==null?'<span class="pos">+'+u(dist*ugx)+'</span>':'-';
+        var rr=rd?(dist/rd):null;
+        t+='<tr><td>'+x[0]+'</td><td>'+p(x[1])+'</td><td>'+p(dist)+'</td><td>'+pr+'</td><td>'+(rr!==null?rr.toFixed(2)+' : 1':'-')+'</td></tr>';
+        if(rr!==null&&rr<1.5)notes.push(note(x[0]+' pays '+rr.toFixed(2)+' times your risk. Your rule asks for at least 1.5.','warn'));
+      });
+      $('tpOut').innerHTML=t+'</table>';
+    }
+    // limit
+    if(bal&&rk&&ugx){
+      var lim=bal*rk/100, maxd=lim/ugx;
+      var f=row('Most you can lose ('+rk+'% of balance)',u(lim)+' UGX','big')+row('Widest stop that fits',p(maxd)+' price');
+      if(en!==null)f+=row('Stop price that fits',p(en-d*maxd));
+      if(loss!==null){
+        f+=row('Balance needed for this stop',u(loss/(rk/100))+' UGX');
+        if(loss>lim)notes.push(note('This stop risks '+(loss/lim).toFixed(1)+' times your limit ('+u(loss)+' vs '+u(lim)+' UGX). Skip the trade, or accept the larger loss on purpose. Don’t move the stop closer to fit.','bad'));
+        else notes.push(note('The loss of '+u(loss)+' UGX is within your '+u(lim)+' UGX limit.','ok'));
+      }
+      $('fitOut').className='';$('fitOut').innerHTML=f;
+    }else{
+      $('fitOut').className='empty';$('fitOut').textContent='Enter your balance, risk % and UGX per 1.00 move to see the limit.';
+    }
+    // set reward targets
+    if(rd&&en!==null){
+      var r='<table><tr><th>Reward : risk</th><th>Price</th><th>Profit</th></tr>';
+      [1.5,2,3].forEach(function(k){r+='<tr><td>'+k+' : 1</td><td>'+p(en+d*rd*k)+'</td><td>'+(ugx!==null?'<span class="pos">+'+u(rd*k*ugx)+'</span>':'-')+'</td></tr>'});
+      $('rrOut').innerHTML=r+'</table>';
+    }else $('rrOut').innerHTML='<span class="empty">Shown once the stop is set.</span>';
+    if(state.mk==='UKOIL'&&ugx!==null)notes.unshift(note('UKOIL cost per 1.00 move is unverified. Confirm it before sizing.','warn'));
+    if(!notes.length){$('verdict').className='empty';$('verdict').textContent='Fill in the trade to see the checks.'}
+    else{$('verdict').className='';$('verdict').innerHTML=notes.join('')}
+  }
+  ['bal','risk','ugx','entry','floor','buf','tp1','tp2'].forEach(function(i){$(i).addEventListener('input',calc)});
+  calc();
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+</script>
+</body>
+</html>
