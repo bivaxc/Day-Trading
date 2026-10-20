@@ -3,15 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Floor Bounce Calculator</title>
-<link rel="manifest" href="manifest.json">
+<title>Floor Bounce Method</title>
+<meta name="description" content="A simple USOIL and UKOIL day-trading plan: buy the bounce off the floor.">
 <meta name="theme-color" content="#0B2545">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Floor Bounce">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" type="image/png" href="icon-192.png">
 <style>
 :root{
   --bg:#F3F6FB;--card:#FFFFFF;--ink:#0B2545;--mute:#5B6677;--line:#CBD5E4;
@@ -59,14 +57,78 @@ tr:last-child td{border-bottom:0}
 .note{border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.92rem}
 .ok{background:var(--okbg)}.bad{background:var(--badbg)}.warn{background:var(--warnbg)}
 .empty{color:var(--mute)}
+
+main{padding-bottom:96px}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+.tabs button{flex:1;border:0;background:none;color:var(--mute);font:inherit;font-size:.82rem;font-weight:600;min-height:54px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--blue);box-shadow:inset 0 3px 0 var(--blue)}
+.hero{padding:6px 0 14px}
+.hero h1{font-size:2.1rem;line-height:1.08;margin:0 0 8px}
+.tag{font-size:1.02rem;color:var(--mute);margin:0}
+svg.chart{width:100%;height:auto;display:block}
+.lbl{font:600 9px system-ui,sans-serif;fill:var(--mute)}
+.step{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.num{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700}
+.step h3{margin:0 0 2px;font-size:1rem}.step p{margin:0;color:var(--mute);font-size:.92rem}
+.pill{display:inline-block;font-size:.72rem;font-weight:700;color:#fff;border-radius:99px;padding:1px 8px;margin-left:6px;background:var(--blue)}
+.pill.m{background:var(--green)}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.three div{border:2px solid var(--line);border-radius:10px;padding:10px;font-size:.85rem}
+.three b{display:block;margin-bottom:4px}
+.chk label{display:flex;gap:12px;align-items:center;color:var(--ink);font-size:1rem;padding:12px 0;border-bottom:1px solid var(--line);margin:0}
+.chk label:last-of-type{border-bottom:0}
+.chk input{width:24px;height:24px;min-height:24px;flex:none;accent-color:var(--blue);padding:0}
+.btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:8px;padding:10px 14px;min-height:44px;cursor:pointer;margin:8px 8px 0 0}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+ul.l{margin:0;padding-left:20px}ul.l li{margin:6px 0}
+.q{font-size:1.05rem;font-weight:600}
+
+/* ---- glass controls ---- */
+:root{--glass:rgba(255,255,255,.55);--glass-brd:rgba(255,255,255,.75);--glass-sh:0 8px 30px rgba(11,37,69,.18);--sel:rgba(47,111,222,.16);--hi:rgba(255,255,255,.6)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--glass:rgba(28,40,66,.5);--glass-brd:rgba(255,255,255,.16);--glass-sh:0 8px 30px rgba(0,0,0,.55);--sel:rgba(111,160,255,.24);--hi:rgba(255,255,255,.18)}}
+:root[data-theme="dark"]{--glass:rgba(28,40,66,.5);--glass-brd:rgba(255,255,255,.16);--glass-sh:0 8px 30px rgba(0,0,0,.55);--sel:rgba(111,160,255,.24);--hi:rgba(255,255,255,.18)}
+body{background:radial-gradient(60% 35% at 10% 0%,rgba(47,111,222,.22),transparent 70%),radial-gradient(50% 35% at 100% 40%,rgba(232,163,23,.16),transparent 70%),radial-gradient(60% 40% at 0% 100%,rgba(23,126,74,.14),transparent 70%),var(--bg);background-attachment:fixed}
+main{padding-bottom:120px}
+.tabs,.seg,.btn{background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);border:1px solid var(--glass-brd);box-shadow:var(--glass-sh),inset 0 1px 0 var(--hi)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.tabs,.seg,.btn{background:var(--card)}}
+.tabs{left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);border-radius:34px;padding:6px;gap:4px}
+.tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:28px;min-height:58px;font-size:.7rem;box-shadow:none;transition:background .2s,color .2s}
+.tabs button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs button[aria-selected="true"]{background:var(--sel);color:var(--blue);box-shadow:inset 0 1px 0 var(--hi)}
+.seg{border-radius:999px;padding:3px;overflow:visible;gap:2px}
+.seg button{background:transparent;border-radius:999px;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(47,111,222,.45),inset 0 1px 0 rgba(255,255,255,.4)}
+.btn{border-radius:999px;padding:11px 18px}
+.btn.p{background:rgba(47,111,222,.88);border-color:rgba(255,255,255,.35);color:#fff}
+input,select{border-radius:14px}
 </style>
 </head>
 <body>
 <main>
-<h1>Floor Bounce calculator</h1>
-<p class="sub">Work out the stop loss, take profits and the cost of a trade before you enter. Nothing is saved.</p>
+<div id="t-plan" role="tabpanel">
+  <div class="hero"><h1>Buy the bounce off the floor.</h1>
+  <p class="tag">The Floor Bounce Method for USOIL and UKOIL. H1 for the trend, M15 for the entry.</p></div>
+  <section><h2>Your winning trade, drawn out</h2><div id="chart"></div>
+  <p class="hint">USOIL, 19 Oct 2026, M15. Candles simplified, levels real.</p></section>
+  <section><h2>The 6 steps</h2><div id="steps"></div></section>
+  <section><h2>The candle decides</h2>
+  <div class="three"><div style="border-color:var(--green)"><b class="pos">Buy</b>Touches the floor, a candle closes above it.</div>
+  <div style="border-color:var(--red)"><b class="neg">Wait</b>A candle closes below the floor. It failed.</div>
+  <div><b>Skip</b>Price is in the middle. No floor, no trade.</div></div></section>
+</div>
 
-<section aria-labelledby="h-in">
+<div id="t-check" role="tabpanel" hidden>
+  <h1>Before every buy</h1><p class="sub">Tick all 7. If one is missing, there is no trade.</p>
+  <section class="chk"><div id="items"></div>
+  <p class="q" id="status"></p>
+  <button class="btn p" id="toCalc" type="button">Open calculator</button><button class="btn" id="reset" type="button">Clear ticks</button></section>
+</div>
+
+<div id="t-calc" role="tabpanel" hidden>
+  <h1>Calculator</h1>
+  <p class="sub">Work out the stop loss, take profits and the cost of a trade before you enter. Nothing is saved.</p>
+  <section aria-labelledby="h-in">
   <h2 id="h-in">Your trade</h2>
   <div class="grid">
     <div class="full">
@@ -137,9 +199,35 @@ tr:last-child td{border-bottom:0}
   <h2 id="h-v">Check</h2>
   <div id="verdict" class="empty">Fill in the trade to see the checks.</div>
 </section>
-</main>
 
+</div>
+
+<div id="t-rules" role="tabpanel" hidden>
+  <h1>Money rules</h1>
+  <section><h2>Risk 1 to 2% of your balance per trade</h2>
+  <p>Cost of a losing trade = stop distance × UGX per 1.00 move. At 0.01 lot on USOIL that was about 41,600 UGX per 1.00 (an estimate from your own trade; confirm it in MT5).</p>
+  <div class="wrap"><table><tr><th>Stop distance</th><th>Loss at 0.01 lot</th><th>Balance for 2% risk</th></tr>
+  <tr><td>0.20</td><td>8,320</td><td>416,000</td></tr><tr><td>0.30</td><td>12,480</td><td>624,000</td></tr><tr><td>0.45</td><td>18,720</td><td>936,000</td></tr></table></div>
+  <div class="note warn">Honest note: trades with a floor-based stop risk far more than 2% on a small balance. Until it grows: one trade at a time, max 2 losing trades a day, then stop for the day.</div></section>
+  <section><h2>Never</h2><ul class="l" id="never"></ul></section>
+  <section><h2>Two markets, one plan</h2><ul class="l">
+  <li>Same 6 steps for USOIL and UKOIL. Mark floors on each chart separately. Brent and WTI prices differ.</li>
+  <li>They usually move together. Trade one at a time.</li>
+  <li>Check UKOIL’s cost per 1.00 move in MT5 before sizing.</li></ul></section>
+  <section><h2>Good to know</h2><ul class="l">
+  <li>Selling later: in a downtrend flip everything. Lower highs and lows, a ceiling instead of a floor.</li>
+  <li>Not proven yet. The plan comes from one winning trade, so test it on small trades first.</li>
+  <li>This app is a planning tool, not financial advice.</li></ul></section>
+</div>
+</main>
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" data-t="plan" aria-selected="true" aria-label="Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5v3M7 14v4M17 5.5v3M17 16v3"/><rect x="5" y="6.5" width="4" height="7.5" rx="1"/><rect x="15" y="8.5" width="4" height="7.5" rx="1"/></svg><span>Plan</span></button>
+  <button role="tab" data-t="check" aria-selected="false" aria-label="Checklist"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg><span>Checklist</span></button>
+  <button role="tab" data-t="calc" aria-selected="false" aria-label="Calculator"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg><span>Calculator</span></button>
+  <button role="tab" data-t="rules" aria-selected="false" aria-label="Rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg><span>Rules</span></button>
+</nav>
 <script>
+
 (function(){
   var $=function(i){return document.getElementById(i)};
   var state={mk:'USOIL',dr:'buy'};
@@ -200,9 +288,9 @@ tr:last-child td{border-bottom:0}
       tps.forEach(function(x){
         var dist=(x[1]-en)*d;
         if(dist<=0){t+='<tr><td>'+x[0]+'</td><td colspan="4" class="neg">Wrong side of entry</td></tr>';notes.push(note(x[0]+' is on the wrong side of your entry.','bad'));return}
-        var pr=ugx!==null?'<span class="pos">+'+u(dist*ugx)+'</span>':'-';
+        var pr=ugx!==null?'<span class="pos">+'+u(dist*ugx)+'</span>':'—';
         var rr=rd?(dist/rd):null;
-        t+='<tr><td>'+x[0]+'</td><td>'+p(x[1])+'</td><td>'+p(dist)+'</td><td>'+pr+'</td><td>'+(rr!==null?rr.toFixed(2)+' : 1':'-')+'</td></tr>';
+        t+='<tr><td>'+x[0]+'</td><td>'+p(x[1])+'</td><td>'+p(dist)+'</td><td>'+pr+'</td><td>'+(rr!==null?rr.toFixed(2)+' : 1':'—')+'</td></tr>';
         if(rr!==null&&rr<1.5)notes.push(note(x[0]+' pays '+rr.toFixed(2)+' times your risk. Your rule asks for at least 1.5.','warn'));
       });
       $('tpOut').innerHTML=t+'</table>';
@@ -224,7 +312,7 @@ tr:last-child td{border-bottom:0}
     // set reward targets
     if(rd&&en!==null){
       var r='<table><tr><th>Reward : risk</th><th>Price</th><th>Profit</th></tr>';
-      [1.5,2,3].forEach(function(k){r+='<tr><td>'+k+' : 1</td><td>'+p(en+d*rd*k)+'</td><td>'+(ugx!==null?'<span class="pos">+'+u(rd*k*ugx)+'</span>':'-')+'</td></tr>'});
+      [1.5,2,3].forEach(function(k){r+='<tr><td>'+k+' : 1</td><td>'+p(en+d*rd*k)+'</td><td>'+(ugx!==null?'<span class="pos">+'+u(rd*k*ugx)+'</span>':'—')+'</td></tr>'});
       $('rrOut').innerHTML=r+'</table>';
     }else $('rrOut').innerHTML='<span class="empty">Shown once the stop is set.</span>';
     if(state.mk==='UKOIL'&&ugx!==null)notes.unshift(note('UKOIL cost per 1.00 move is unverified. Confirm it before sizing.','warn'));
@@ -234,9 +322,62 @@ tr:last-child td{border-bottom:0}
   ['bal','risk','ugx','entry','floor','buf','tp1','tp2'].forEach(function(i){$(i).addEventListener('input',calc)});
   calc();
 })();
-</script>
-<script>
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+
+
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  // tabs
+  var tabs=document.querySelectorAll('.tabs button');
+  function show(t){
+    ['plan','check','calc','rules'].forEach(function(k){$('t-'+k).hidden=(k!==t)});
+    Array.prototype.forEach.call(tabs,function(b){b.setAttribute('aria-selected',b.getAttribute('data-t')===t?'true':'false')});
+    window.scrollTo(0,0);try{history.replaceState(null,'','#'+t)}catch(e){}
+  }
+  Array.prototype.forEach.call(tabs,function(b){b.addEventListener('click',function(){show(b.getAttribute('data-t'))})});
+  var h=(location.hash||'').slice(1);if(['plan','check','calc','rules'].indexOf(h)>-1)show(h);
+  // steps
+  var steps=[
+   ['Read the trend','H1','Higher highs and higher lows = uptrend, so you only look for buys. If the trend is down or sideways, stay out of buys.'],
+   ['Mark the floors','H1','A floor is an old resistance that price broke and now holds as support. Draw a line on it.'],
+   ['Be patient','M15','Wait for price to come down to the floor. If it is in the middle between two lines, do nothing.'],
+   ['Wait for the bounce candle','M15','Price touches the floor, then a 15m candle closes back above it. A close below the floor = no buy.'],
+   ['Buy and set the stop right away','M15','Enter after that candle closes. Stop just below the floor (about 0.15 to 0.25 under it). No stop = no trade.'],
+   ['Take profit at the next line','M15','Target 1 = nearest resistance, a little before the line. Reward must be at least 1.5 times the risk, or skip.']];
+  $('steps').innerHTML=steps.map(function(s,i){return '<div class="step"><div class="num">'+(i+1)+'</div><div><h3>'+s[0]+'<span class="pill'+(s[1]==='M15'?' m':'')+'">'+s[1]+'</span></h3><p>'+s[2]+'</p></div></div>'}).join('');
+  // never list
+  $('never').innerHTML=['Buy because price is falling toward the floor. Wait for the closed candle.','Buy a candle that is still moving. Wait for it to close.','Trade in the middle of the range.','Trade without a stop loss, or move the stop lower.','Add a second trade when you are already in one.','Chase price after a win. Wait for the next clean setup.','Hold through big news (EIA Wednesday, OPEC+).'].map(function(x){return '<li>'+x+'</li>'}).join('');
+  // checklist
+  var items=['H1 trend is up (higher highs and higher lows)','I can see the floor line on my chart','Price touched the floor on M15','A 15m candle has closed above the floor','My stop loss is set just below the floor','Target 1 is at least 1.5x my risk away','No big news soon (EIA Wednesday, OPEC+)'];
+  $('items').innerHTML=items.map(function(t,i){return '<label><input type="checkbox" data-i="'+i+'">'+t+'</label>'}).join('');
+  var boxes=document.querySelectorAll('#items input');
+  function stat(){
+    var n=0;Array.prototype.forEach.call(boxes,function(b){if(b.checked)n++});
+    var s=$('status');
+    if(n===7){s.className='q pos';s.textContent='All 7 ticked. The setup is valid. Now check the stop cost.'}
+    else{s.className='q';s.textContent=n+' of 7 ticked. '+(7-n)+' to go.'}
+  }
+  Array.prototype.forEach.call(boxes,function(b){b.addEventListener('change',stat)});
+  $('reset').addEventListener('click',function(){Array.prototype.forEach.call(boxes,function(b){b.checked=false});stat()});
+  $('toCalc').addEventListener('click',function(){show('calc')});
+  stat();
+  // schematic chart
+  var D=[[95.6,95.9,95.5,95.8],[95.8,96.1,95.7,96.0],[96.0,96.0,95.6,95.7],[95.7,96.3,95.7,96.2],[96.2,96.9,96.1,96.8],[96.8,97.6,96.7,97.5],[97.5,98.3,97.4,98.2],[98.2,98.9,98.1,98.8],[98.8,99.2,98.7,99.1],[99.1,99.3,98.8,98.9],[98.9,99.0,98.7,98.8],[98.8,98.9,98.3,98.4],[98.4,98.5,97.9,98.0],[98.0,98.1,97.6,97.7],[97.7,97.9,97.4,97.5],[97.5,97.7,97.2,97.3],[97.3,97.4,97.0,97.1],[97.1,97.15,96.8,96.9],[96.9,96.95,96.62,96.75],[96.75,96.95,96.60,96.88],[96.88,97.15,96.85,97.1],[97.1,97.5,97.05,97.45],[97.45,97.9,97.4,97.85],[97.85,98.3,97.8,98.25]];
+  var W=360,Ht=230,L=4,R=240,y=function(p){return Ht-10-(p-95.4)/4.1*(Ht-20)};
+  var s='<svg class="chart" viewBox="0 0 '+W+' '+Ht+'" role="img" aria-label="Schematic chart: price pulls back to the floor at 96.616, bounces, and runs to the targets">';
+  s+='<rect x="'+L+'" y="'+y(96.616)+'" width="'+(W-L*2)+'" height="'+(y(96.45)-y(96.616))+'" fill="var(--okbg)"/>';
+  [[97.731,'Target 2 97.731','var(--green)',1],[97.149,'Target 1 97.149','var(--green)',1],[96.616,'Floor 96.616','var(--blue)',0],[96.45,'Stop 96.450','var(--red)',1]].forEach(function(l){
+    s+='<line x1="'+L+'" x2="'+(W-L)+'" y1="'+y(l[0])+'" y2="'+y(l[0])+'" stroke="'+l[2]+'" stroke-width="1.2"'+(l[3]?' stroke-dasharray="4 3"':'')+'/><text class="lbl" x="'+(R+12)+'" y="'+(y(l[0])-3)+'" style="fill:'+l[2]+'">'+l[1]+'</text>';});
+  var st=(R-L-20)/D.length;
+  D.forEach(function(c,i){var x=L+12+i*st,col=c[3]>=c[0]?'var(--green)':'var(--red)',t=y(Math.max(c[0],c[3])),b=y(Math.min(c[0],c[3]));
+    s+='<line x1="'+x+'" x2="'+x+'" y1="'+y(c[1])+'" y2="'+y(c[2])+'" stroke="'+col+'"/><rect x="'+(x-st*.3)+'" y="'+t+'" width="'+(st*.6)+'" height="'+Math.max(b-t,1.2)+'" fill="'+col+'"/>';});
+  var bx=L+12+19*st;
+  s+='<path d="M'+bx+' '+(y(96.6)+4)+' l-5 9 h10z" fill="var(--green)"/>';
+  s+='<text class="lbl" x="'+(L+4)+'" y="24">1 H1 uptrend</text><text class="lbl" x="140" y="40">2 Pullback to the floor</text><text class="lbl" x="'+(bx+12)+'" y="'+y(96.1)+'" text-anchor="end">3 Buy 96.885 after the close</text></svg>';
+  $('chart').innerHTML=s;
+  // offline support
+  if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){navigator.serviceWorker.register('sw.js').catch(function(){})}
+})();
+
 </script>
 </body>
 </html>

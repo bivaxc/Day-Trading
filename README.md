@@ -1,23 +1,29 @@
-# Floor Bounce Calculator
+# Floor Bounce Method: free web app
 
-Installable web app (PWA) for the Floor Bounce Method on USOIL and UKOIL.
+Files:
+- index.html  (the whole app; works on its own)
+- manifest.webmanifest, sw.js, icons/  (optional: lets the phone install it and use it offline)
 
-## Files
-- index.html : the calculator
-- manifest.json : app name, colors, icons
-- sw.js : service worker (offline use)
-- icon-180.png, icon-192.png, icon-512.png : app icons
+## Host it free (pick one)
 
-## Deploy on GitHub Pages
-1. Open your repo on github.com, tap Add file > Upload files.
-2. Upload ALL files above to the repo root (not inside a folder). Commit.
-3. Settings > Pages > Source: Deploy from a branch > Branch: main, folder: / (root) > Save.
-4. Wait 1 to 2 minutes. Your link will be https://YOUR-USERNAME.github.io/YOUR-REPO/
+### Netlify Drop (easiest, no account needed to start)
+1. Open https://app.netlify.com/drop
+2. Drag the unzipped folder in. You get a free link right away.
 
-## Install on iPhone
-1. Open the link in Safari (must be Safari).
-2. Tap Share > Add to Home Screen > Add.
-3. Open it from the home screen. It runs full screen and works offline after the first load.
+### GitHub Pages
+1. Create a free GitHub account and a new public repository.
+2. Upload all the files (keep the icons folder).
+3. Settings > Pages > Deploy from a branch > main > Save.
+4. Your link: https://YOUR-NAME.github.io/REPO-NAME/
 
-## Updating later
-Edit index.html, then change CACHE='fbm-v1' to 'fbm-v2' in sw.js so phones fetch the new version.
+### Cloudflare Pages
+1. Free account > Workers & Pages > Create > Pages > Upload assets.
+2. Upload the folder.
+
+## Install on your phone
+Open the link in Chrome (Android) or Safari (iPhone), then use "Add to Home screen".
+
+## Notes
+- Nothing is saved or sent anywhere. Your balance is never stored.
+- To change the app later, edit index.html and upload it again.
+- A planning tool, not financial advice.
