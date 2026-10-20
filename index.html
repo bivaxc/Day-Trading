@@ -142,6 +142,12 @@ main{padding-bottom:92px}
 .tabs button{flex:0 0 auto;min-width:0;padding:4px 11px;white-space:nowrap}
 @media (max-width:370px){.tabs button{padding:4px 7px;font-size:.62rem}}
 
+/* ---- uniform, fixed-position tab bar ---- */
+html{scrollbar-gutter:stable}
+.tabs{position:fixed;left:0;right:0;margin:0 auto;transform:none;width:min(400px,calc(100% - 16px));max-width:none;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;bottom:calc(env(safe-area-inset-bottom,0px) * .4 + 4px)}
+.tabs button{width:100%;min-width:0;height:50px;min-height:50px;padding:4px 2px;flex:none;margin:0;transition:none}
+.tabs button[aria-selected="true"],.tabs button[aria-selected="false"]{border-radius:999px}
+
 /* ---- desktop layout (wide screens only, phone layout unchanged) ---- */
 @media (min-width:900px){
   main{max-width:1080px;padding:32px 28px 110px}
