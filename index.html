@@ -6,6 +6,7 @@
 <title>Floor Bounce Method</title>
 <meta name="description" content="A simple USOIL and UKOIL day-trading plan: buy the bounce off the floor.">
 <meta name="theme-color" content="#0A0A0B">
+<script>try{var t=localStorage.getItem("fbm-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -27,7 +28,7 @@
   --okbg:#10321F;--badbg:#3A1717;--warnbg:#3A2E10;color-scheme:dark;}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Cambria,"Cambria Math",Georgia,"Times New Roman",serif;font-variant-numeric:tabular-nums}
 main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
 h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.01em}
 .sub{color:var(--mute);margin:0 0 18px;font-size:.95rem}
@@ -66,7 +67,7 @@ main{padding-bottom:96px}
 .hero h1{font-size:2.1rem;line-height:1.08;margin:0 0 8px}
 .tag{font-size:1.02rem;color:var(--mute);margin:0}
 svg.chart{width:100%;height:auto;display:block}
-.lbl{font:600 9px system-ui,sans-serif;fill:var(--mute)}
+.lbl{font:600 9px Cambria,Georgia,serif;fill:var(--mute)}
 .step{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .step:last-child{border-bottom:0}
 .num{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700}
@@ -128,6 +129,17 @@ main{padding-bottom:100px}
 .tabs{left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);padding:4px;gap:2px;border-radius:999px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 .tabs button{min-height:46px;min-width:68px;padding:4px 12px;border-radius:999px;font-size:.62rem;gap:2px}
 .tabs button svg{width:19px;height:19px}
+
+/* ---- lower bar, Cambria, settings ---- */
+button,input,select,textarea{font-family:inherit}
+.tabs{bottom:calc(env(safe-area-inset-bottom,0px) * .4 + 4px)}
+.tabs button{min-width:60px;padding:4px 8px;font-size:.68rem}
+main{padding-bottom:92px}
+
+/* ---- bar fits its labels ---- */
+.tabs{max-width:calc(100% - 16px)}
+.tabs button{flex:0 0 auto;min-width:0;padding:4px 11px;white-space:nowrap}
+@media (max-width:370px){.tabs button{padding:4px 7px;font-size:.62rem}}
 </style>
 </head>
 <body>
@@ -245,12 +257,20 @@ main{padding-bottom:100px}
   <li>Not proven yet. The plan comes from one winning trade, so test it on small trades first.</li>
   <li>This app is a planning tool, not financial advice.</li></ul></section>
 </div>
+<div id="t-settings" role="tabpanel" hidden>
+  <h1>Settings</h1>
+  <section><h2>Appearance</h2>
+  <div class="seg" id="th"><button type="button" data-v="system" aria-pressed="true">System</button><button type="button" data-v="light" aria-pressed="false">Light</button><button type="button" data-v="dark" aria-pressed="false">Dark</button></div>
+  <p class="hint">System follows your phone. Your choice is saved on this device.</p></section>
+  <section><h2>About</h2><p>The Floor Bounce Method for USOIL and UKOIL. Nothing you type in the calculator is saved. Only your theme choice is stored on this device.</p></section>
+</div>
 </main>
 <nav class="tabs" role="tablist" aria-label="Sections">
   <button role="tab" data-t="plan" aria-selected="true" aria-label="Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5v3M7 14v4M17 5.5v3M17 16v3"/><rect x="5" y="6.5" width="4" height="7.5" rx="1"/><rect x="15" y="8.5" width="4" height="7.5" rx="1"/></svg><span>Plan</span></button>
   <button role="tab" data-t="check" aria-selected="false" aria-label="Checklist"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg><span>Checklist</span></button>
   <button role="tab" data-t="calc" aria-selected="false" aria-label="Calculator"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg><span>Calculator</span></button>
   <button role="tab" data-t="rules" aria-selected="false" aria-label="Rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg><span>Rules</span></button>
+  <button role="tab" data-t="settings" aria-selected="false" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg><span>Settings</span></button>
 </nav>
 <script>
 
@@ -355,12 +375,12 @@ main{padding-bottom:100px}
   // tabs
   var tabs=document.querySelectorAll('.tabs button');
   function show(t){
-    ['plan','check','calc','rules'].forEach(function(k){$('t-'+k).hidden=(k!==t)});
+    ['plan','check','calc','rules','settings'].forEach(function(k){$('t-'+k).hidden=(k!==t)});
     Array.prototype.forEach.call(tabs,function(b){b.setAttribute('aria-selected',b.getAttribute('data-t')===t?'true':'false')});
     window.scrollTo(0,0);try{history.replaceState(null,'','#'+t)}catch(e){}
   }
   Array.prototype.forEach.call(tabs,function(b){b.addEventListener('click',function(){show(b.getAttribute('data-t'))})});
-  var h=(location.hash||'').slice(1);if(['plan','check','calc','rules'].indexOf(h)>-1)show(h);
+  var h=(location.hash||'').slice(1);if(['plan','check','calc','rules','settings'].indexOf(h)>-1)show(h);
   // steps
   var steps=[
    ['Read the trend','H1','Higher highs and higher lows = uptrend, so you only look for buys. If the trend is down or sideways, stay out of buys.'],
@@ -404,6 +424,22 @@ main{padding-bottom:100px}
   if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){navigator.serviceWorker.register('sw.js').catch(function(){})}
 })();
 
+</script>
+<script>
+(function(){
+  var seg=document.getElementById('th'),btns=seg.querySelectorAll('button');
+  function mark(v){Array.prototype.forEach.call(btns,function(b){b.setAttribute('aria-pressed',b.getAttribute('data-v')===v?'true':'false')})}
+  function apply(v){
+    var r=document.documentElement;
+    if(v==='light'||v==='dark')r.setAttribute('data-theme',v);else r.removeAttribute('data-theme');
+    var dark=v==='dark'||(v!=='light'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+    var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',dark?'#0A0A0B':'#F3F6FB');
+    mark(v);
+  }
+  var cur='system';try{var t=localStorage.getItem('fbm-theme');if(t==='light'||t==='dark')cur=t}catch(e){}
+  apply(cur);
+  seg.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var v=b.getAttribute('data-v');apply(v);try{localStorage.setItem('fbm-theme',v)}catch(x){}});
+})();
 </script>
 </body>
 </html>
