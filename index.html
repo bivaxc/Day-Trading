@@ -198,24 +198,44 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
 @media (max-width:899px){
   html.standalone nav.tabs{bottom:max(2px,calc(env(safe-area-inset-bottom,0px) - 18px))}
 }
+
+
+
+
+/* iPhone fix: keep the floating bar anchored to the visible viewport bottom. */
+@media (max-width:899px) {
+  html {
+    height: auto !important;
+    min-height: 100%;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+  body {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
+  body nav.tabs {
+    position: fixed !important;
+    top: auto !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px) !important;
+    margin: 0 !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: none !important;
+    z-index: 9999 !important;
+  }
+}
+
 </style>
 <script>try{if(window.navigator.standalone===true)document.documentElement.classList.add("standalone")}catch(e){}</script>
 
-/* Final iPhone positioning override: lower the floating navigation to match Telegram. */
-@media (max-width:899px){
-  nav.tabs{
-    bottom:0 !important;
-    margin-bottom:0 !important;
-  }
-}
-@media (max-width:899px) and (display-mode:standalone){
-  nav.tabs{
-    bottom:0 !important;
-  }
-}
-html.standalone nav.tabs{
-  bottom:0 !important;
-}
 
 </head>
 <body>
