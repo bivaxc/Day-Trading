@@ -144,7 +144,7 @@ main{padding-bottom:92px}
 
 /* ---- uniform, fixed-position tab bar ---- */
 html{scrollbar-gutter:stable}
-.tabs{position:fixed;left:0;right:0;margin:0 auto;transform:none;width:min(400px,calc(100% - 16px));max-width:none;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;bottom:calc(env(safe-area-inset-bottom,0px) * .4 + 4px)}
+.tabs{position:fixed;left:0;right:0;margin:0 auto;transform:none;width:min(400px,calc(100% - 16px));max-width:none;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;bottom:calc(env(safe-area-inset-bottom,0px) * .4 + 4px)}
 .tabs button{width:100%;min-width:0;height:50px;min-height:50px;padding:4px 2px;flex:none;margin:0;transition:none}
 .tabs button[aria-selected="true"],.tabs button[aria-selected="false"]{border-radius:999px}
 
@@ -162,27 +162,41 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   section{padding:20px 22px}
   #t-plan:not([hidden]){display:grid;grid-template-columns:1.25fr 1fr;gap:0 18px;align-items:start}
   #t-plan>.hero,#t-plan>section:last-child{grid-column:1/-1}
-  #t-calc:not([hidden]){display:grid;grid-template-columns:1.05fr 1fr;gap:0 18px;align-items:start;grid-auto-flow:row dense}
-  #t-calc>h1,#t-calc>.sub{grid-column:1/-1}
-  #t-calc>section{grid-column:2}
-  #t-calc>section:first-of-type{grid-column:1;grid-row:3/span 6}
+  #tradeCalculator{display:grid;grid-template-columns:1.05fr 1fr;gap:0 18px;align-items:start;grid-auto-flow:row dense}
+  #tradeCalculator>h1,#tradeCalculator>.sub{grid-column:1/-1}
+  #tradeCalculator>section{grid-column:2}
+  #tradeCalculator>section:first-of-type{grid-column:1;grid-row:3/span 6}
   #t-rules:not([hidden]){column-count:2;column-gap:18px}
   #t-rules>h1{column-span:all}
   #t-rules>section{break-inside:avoid}
-  #t-check:not([hidden]),#t-settings:not([hidden]){max-width:680px;margin:0 auto}
+  #t-trade:not([hidden]),#t-settings:not([hidden]){max-width:680px;margin:0 auto}
   .btn,.seg button,.tabs button{cursor:pointer}
   .btn:hover,.seg button:hover,.tabs button:hover{filter:brightness(1.12)}
 }
 
+
+/* ---- combined Trade workspace and independent strategy chips ---- */
+.strategy-switch{margin:8px 0 4px}
+.strategy-switch button{min-height:44px;font-size:.92rem}
+#tradeCalculator{scroll-margin-top:16px}
+.trade-divider{display:flex;align-items:center;gap:10px;margin:20px 0 12px;color:var(--mute);font-size:.72rem;font-weight:800;letter-spacing:.12em}
+.trade-divider:before,.trade-divider:after{content:"";height:1px;background:var(--line);flex:1}
+#floorChecklist>h2,#mtfChecklist>h2{margin:14px 0 4px}
+#floorChecklist>.sub,#mtfChecklist>.sub{margin-bottom:10px}
+#mtfItems label{display:flex;gap:12px;align-items:flex-start;color:var(--ink);font-size:1rem;padding:12px 0;border-bottom:1px solid var(--line);margin:0}
+#mtfItems label:last-child{border-bottom:0}
+#mtfItems input{width:24px;height:24px;min-height:24px;flex:none;accent-color:var(--accent);padding:0;margin:0}
+#t-trade>section{margin-bottom:12px}
+
 /* ---- phone: bar sits low, Telegram-style ---- */
 @media (max-width:899px){
-  nav.tabs{bottom:6px}
+  nav.tabs{bottom:2px}
 }
 @media (max-width:899px) and (display-mode:standalone){
-  nav.tabs{bottom:max(6px,calc(env(safe-area-inset-bottom,0px) - 13px))}
+  nav.tabs{bottom:max(2px,calc(env(safe-area-inset-bottom,0px) - 18px))}
 }
 @media (max-width:899px){
-  html.standalone nav.tabs{bottom:max(6px,calc(env(safe-area-inset-bottom,0px) - 13px))}
+  html.standalone nav.tabs{bottom:max(2px,calc(env(safe-area-inset-bottom,0px) - 18px))}
 }
 </style>
 <script>try{if(window.navigator.standalone===true)document.documentElement.classList.add("standalone")}catch(e){}</script>
@@ -202,15 +216,47 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   <div><b>Skip</b>Price is in the middle. No floor, no trade.</div></div></section>
 </div>
 
-<div id="t-check" role="tabpanel" hidden>
-  <h1>Before every buy</h1><p class="sub">Tick all 7. If one is missing, there is no trade.</p>
-  <section class="chk"><div id="items"></div>
-  <p class="q" id="status"></p>
-  <button class="btn p" id="toCalc" type="button">Open calculator</button><button class="btn" id="reset" type="button">Clear ticks</button></section>
-</div>
-
-<div id="t-calc" role="tabpanel" hidden>
-  <h1>Calculator</h1>
+<div id="t-trade" role="tabpanel" hidden>
+  <h1>Trade workspace</h1>
+  <p class="sub">Choose one strategy. Its checklist stays separate; use the calculator below for that setup's prices and risk.</p>
+  <section>
+    <h2>Choose your setup</h2>
+    <div class="seg strategy-switch" id="strategySwitch" role="group" aria-label="Choose trading strategy">
+      <button type="button" data-strategy="floor" aria-pressed="true">Floor Bounce</button>
+      <button type="button" data-strategy="mtf" aria-pressed="false">4H Strategy</button>
+    </div>
+    <p id="strategyHint" class="hint">Floor Bounce: H1 trend and floor, then M15 bounce confirmation.</p>
+  </section>
+  <div id="floorChecklist">
+    <h2>Floor Bounce checklist</h2>
+    <p class="sub">Use only for the Floor Bounce setup.</p>
+    <section class="chk"><div id="items"></div>
+      <p class="q" id="status"></p>
+      <button class="btn p" id="toCalc" type="button">Go to calculator</button>
+      <button class="btn" id="reset" type="button">Clear ticks</button>
+    </section>
+  </div>
+  <div id="mtfChecklist" hidden>
+    <h2>4H Strategy checklist</h2>
+    <p class="sub">Use only for the independent liquidity and market-structure setup.</p>
+    <section class="chk">
+      <div id="mtfItems">
+        <label><input type="checkbox"> 4H direction is clear</label>
+        <label><input type="checkbox"> 1H EQH/EQL or meaningful liquidity levels are marked</label>
+        <label><input type="checkbox"> Price interacted with the 1H liquidity area; a sweep alone is not a signal</label>
+        <label><input type="checkbox"> 15M confirms a meaningful BOS or CHoCH in the intended direction</label>
+        <label><input type="checkbox"> The 15M candle closed beyond the structure level</label>
+        <label><input type="checkbox"> 5M gives a planned pullback/retest or entry trigger</label>
+        <label><input type="checkbox"> Stop Loss is beyond the setup's invalidation point</label>
+        <label><input type="checkbox"> Target is a logical opposing swing/liquidity area and reward justifies risk</label>
+        <label><input type="checkbox"> Spread and major scheduled news have been checked</label>
+      </div>
+      <p class="q" id="mtfStatus">0 of 9 checked.</p>
+      <button class="btn" id="mtfReset" type="button">Clear 4H ticks</button>
+    </section>
+  </div>
+  <div id="tradeCalculator"><div class="trade-divider"><span>RISK &amp; POSITION CALCULATOR</span></div>
+    <h2>Risk &amp; position calculator</h2>
   <p class="sub">Work out the stop loss, take profits and the cost of a trade before you enter. Nothing is saved.</p>
   <section aria-labelledby="h-in">
   <h2 id="h-in">Your trade</h2>
@@ -283,7 +329,7 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   <h2 id="h-v">Check</h2>
   <div id="verdict" class="empty">Fill in the trade to see the checks.</div>
 </section>
-
+  </div>
 </div>
 
 <div id="t-rules" role="tabpanel" hidden>
@@ -325,61 +371,18 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   <li>Not proven yet. The plan comes from one winning trade, so test it on small trades first.</li>
   <li>This app is a planning tool, not financial advice.</li></ul></section>
 </div>
-<div id="t-mtf" role="tabpanel" hidden>
-  <div class="hero">
-    <h1>4H → 1H → 15M → 5M</h1>
-    <p class="tag">Independent multi-timeframe liquidity and market-structure strategy. This is separate from the Floor Bounce Method.</p>
-  </div>
-  <section>
-    <h2>Strategy workflow</h2>
-    <p class="hint">Follow the timeframes in order. This setup does not require a floor-bounce candle; it requires its own liquidity and structure confirmations.</p>
-    <div class="step"><div class="num">1</div><div><h3>4H — Direction <span class="pill">H4</span></h3><p>Identify the broader structure. Higher highs and higher lows favour bullish setups; lower highs and lower lows favour bearish setups. If the direction is unclear, stand aside.</p></div></div>
-    <div class="step"><div class="num">2</div><div><h3>1H — Liquidity <span class="pill">H1</span></h3><p>Mark equal highs (EQH), equal lows (EQL), and clear swing points. Watch for price to sweep a level. A sweep alone is not an entry signal.</p></div></div>
-    <div class="step"><div class="num">3</div><div><h3>15M — BOS / CHoCH <span class="pill m">M15</span></h3><p>After price interacts with the liquidity area, look for a meaningful Break of Structure (BOS) or Change of Character (CHoCH). Prefer a candle close beyond the relevant swing level.</p></div></div>
-    <div class="step"><div class="num">4</div><div><h3>5M — Place the trade <span class="pill m">M5</span></h3><p>Wait for a pullback or retest and a defined entry trigger that agrees with the 4H direction and 15M confirmation. Put the stop beyond the setup's invalidation point.</p></div></div>
-  </section>
-  <section>
-    <h2>Independent pre-trade checklist</h2>
-    <p class="hint">These checks apply only to the 4H/1H/15M/5M strategy. They do not replace or change the Floor Bounce checklist.</p>
-    <div id="mtfItems" class="checks">
-      <label><input type="checkbox"> 4H direction is clear</label>
-      <label><input type="checkbox"> 1H EQH/EQL or meaningful liquidity levels are marked</label>
-      <label><input type="checkbox"> Price has interacted with the 1H liquidity area; sweep alone is not treated as a signal</label>
-      <label><input type="checkbox"> 15M confirms a meaningful BOS or CHoCH in the intended direction</label>
-      <label><input type="checkbox"> The relevant 15M candle has closed beyond the structure level</label>
-      <label><input type="checkbox"> 5M provides a planned pullback/retest or entry trigger</label>
-      <label><input type="checkbox"> Stop Loss is beyond the setup invalidation point</label>
-      <label><input type="checkbox"> Target is a logical opposing swing/liquidity area and reward justifies risk</label>
-      <label><input type="checkbox"> Spread and major scheduled news have been checked</label>
-    </div>
-    <p id="mtfStatus" class="q">0 of 9 checked. Complete the checks before considering a trade.</p>
-    <button type="button" class="secondary" id="mtfReset">Reset this checklist</button>
-  </section>
-  <section>
-    <h2>Risk and limitations</h2>
-    <ul class="l">
-      <li>Use the existing Calculator if you want to calculate position risk, but enter prices from this strategy's own setup.</li>
-      <li>Do not assume a liquidity sweep guarantees reversal. Price may continue through the level.</li>
-      <li>This is a manual guide. It does not connect to MT5 or automatically detect live BOS, CHoCH or liquidity sweeps.</li>
-      <li>Test the rules on a demo account and record results before risking real money.</li>
-    </ul>
-    <button type="button" id="mtfToCalc">Open Calculator</button>
-  </section>
-</div>
 <div id="t-settings" role="tabpanel" hidden>
   <h1>Settings</h1>
   <section><h2>Appearance</h2>
   <div class="seg" id="th"><button type="button" data-v="system" aria-pressed="true">System</button><button type="button" data-v="light" aria-pressed="false">Light</button><button type="button" data-v="dark" aria-pressed="false">Dark</button></div>
   <p class="hint">System follows your phone. Your choice is saved on this device.</p></section>
-  <section><h2>About</h2><p>The Floor Bounce Method for USOIL and UKOIL. Nothing you type in the calculator is saved. Only your theme choice is stored on this device.</p></section>
+  <section><h2>About</h2><p>Two independent trading setups: Floor Bounce and 4H liquidity/market structure. Checklist and risk calculator are together in Trade. Calculator inputs are not saved; only your theme choice is stored on this device.</p></section>
 </div>
 </main>
 <nav class="tabs" role="tablist" aria-label="Sections">
   <button role="tab" data-t="plan" aria-selected="true" aria-label="Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5v3M7 14v4M17 5.5v3M17 16v3"/><rect x="5" y="6.5" width="4" height="7.5" rx="1"/><rect x="15" y="8.5" width="4" height="7.5" rx="1"/></svg><span>Plan</span></button>
-  <button role="tab" data-t="check" aria-selected="false" aria-label="Checklist"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg><span>Checklist</span></button>
-  <button role="tab" data-t="calc" aria-selected="false" aria-label="Calculator"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg><span>Calculator</span></button>
+  <button role="tab" data-t="trade" aria-selected="false" aria-label="Trade"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h3M15 13l2 2 3-4"/></svg><span>Trade</span></button>
   <button role="tab" data-t="rules" aria-selected="false" aria-label="Rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg><span>Rules</span></button>
-  <button role="tab" data-t="mtf" aria-selected="false" aria-label="Multi-timeframe strategy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18l5-6 4 3 7-9"/><path d="M14 6h5v5"/></svg><span>4H Strategy</span></button>
   <button role="tab" data-t="settings" aria-selected="false" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg><span>Settings</span></button>
 </nav>
 <script>
@@ -485,24 +488,12 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   // tabs
   var tabs=document.querySelectorAll('.tabs button');
   function show(t){
-    ['plan','check','calc','rules','mtf','settings'].forEach(function(k){$('t-'+k).hidden=(k!==t)});
+    ['plan','trade','rules','settings'].forEach(function(k){$('t-'+k).hidden=(k!==t)});
     Array.prototype.forEach.call(tabs,function(b){b.setAttribute('aria-selected',b.getAttribute('data-t')===t?'true':'false')});
     window.scrollTo(0,0);try{history.replaceState(null,'','#'+t)}catch(e){}
   }
   Array.prototype.forEach.call(tabs,function(b){b.addEventListener('click',function(){show(b.getAttribute('data-t'))})});
-  var h=(location.hash||'').slice(1);if(['plan','check','calc','rules','mtf','settings'].indexOf(h)>-1)show(h);
-  // Independent 4H strategy checklist; does not share state with Floor Bounce checklist.
-  var mtfBoxes=document.querySelectorAll('#mtfItems input[type="checkbox"]');
-  function mtfStat(){
-    var n=0;Array.prototype.forEach.call(mtfBoxes,function(b){if(b.checked)n++});
-    var s=$('mtfStatus');
-    if(n===mtfBoxes.length){s.className='q pos';s.textContent='All '+mtfBoxes.length+' checks ticked. Verify the chart and calculator; a completed checklist does not guarantee a winning trade.'}
-    else{s.className='q';s.textContent=n+' of '+mtfBoxes.length+' checked. '+(mtfBoxes.length-n)+' remaining.'}
-  }
-  Array.prototype.forEach.call(mtfBoxes,function(b){b.addEventListener('change',mtfStat)});
-  $('mtfReset').addEventListener('click',function(){Array.prototype.forEach.call(mtfBoxes,function(b){b.checked=false});mtfStat()});
-  $('mtfToCalc').addEventListener('click',function(){show('calc')});
-  mtfStat();
+  var h=(location.hash||'').slice(1);if(['plan','trade','rules','settings'].indexOf(h)>-1)show(h);
   // steps
   var steps=[
    ['Read the trend','H1','Higher highs and higher lows = uptrend, so you only look for buys. If the trend is down or sideways, stay out of buys.'],
@@ -526,8 +517,34 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   }
   Array.prototype.forEach.call(boxes,function(b){b.addEventListener('change',stat)});
   $('reset').addEventListener('click',function(){Array.prototype.forEach.call(boxes,function(b){b.checked=false});stat()});
-  $('toCalc').addEventListener('click',function(){show('calc')});
+  $('toCalc').addEventListener('click',function(){$('tradeCalculator').scrollIntoView({behavior:'smooth',block:'start'})});
   stat();
+  // Strategy selector: separate rule sets, shared calculator only.
+  var strategyButtons=document.querySelectorAll('#strategySwitch button');
+  function selectStrategy(which){
+    var floor=which==='floor';
+    $('floorChecklist').hidden=!floor;
+    $('mtfChecklist').hidden=floor;
+    $('strategyHint').textContent=floor
+      ? 'Floor Bounce: H1 trend and floor, then M15 bounce confirmation.'
+      : '4H Strategy: H4 direction, H1 liquidity, M15 BOS/CHoCH, then M5 entry.';
+    Array.prototype.forEach.call(strategyButtons,function(b){
+      b.setAttribute('aria-pressed',b.getAttribute('data-strategy')===which?'true':'false');
+    });
+  }
+  Array.prototype.forEach.call(strategyButtons,function(b){
+    b.addEventListener('click',function(){selectStrategy(b.getAttribute('data-strategy'))});
+  });
+  var mtfBoxes=document.querySelectorAll('#mtfItems input[type="checkbox"]');
+  function mtfStat(){
+    var n=0;Array.prototype.forEach.call(mtfBoxes,function(b){if(b.checked)n++});
+    var s=$('mtfStatus');
+    if(n===mtfBoxes.length){s.className='q pos';s.textContent='All '+mtfBoxes.length+' checked. Verify your chart and risk calculation; this does not guarantee a winning trade.'}
+    else{s.className='q';s.textContent=n+' of '+mtfBoxes.length+' checked. '+(mtfBoxes.length-n)+' remaining.'}
+  }
+  Array.prototype.forEach.call(mtfBoxes,function(b){b.addEventListener('change',mtfStat)});
+  $('mtfReset').addEventListener('click',function(){Array.prototype.forEach.call(mtfBoxes,function(b){b.checked=false});mtfStat()});
+  mtfStat();
   // schematic chart
   var D=[[95.6,95.9,95.5,95.8],[95.8,96.1,95.7,96.0],[96.0,96.0,95.6,95.7],[95.7,96.3,95.7,96.2],[96.2,96.9,96.1,96.8],[96.8,97.6,96.7,97.5],[97.5,98.3,97.4,98.2],[98.2,98.9,98.1,98.8],[98.8,99.2,98.7,99.1],[99.1,99.3,98.8,98.9],[98.9,99.0,98.7,98.8],[98.8,98.9,98.3,98.4],[98.4,98.5,97.9,98.0],[98.0,98.1,97.6,97.7],[97.7,97.9,97.4,97.5],[97.5,97.7,97.2,97.3],[97.3,97.4,97.0,97.1],[97.1,97.15,96.8,96.9],[96.9,96.95,96.62,96.75],[96.75,96.95,96.60,96.88],[96.88,97.15,96.85,97.1],[97.1,97.5,97.05,97.45],[97.45,97.9,97.4,97.85],[97.85,98.3,97.8,98.25]];
   var W=360,Ht=230,L=4,R=240,y=function(p){return Ht-10-(p-95.4)/4.1*(Ht-20)};
