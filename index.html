@@ -202,14 +202,14 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
 
 
 
-/* Mobile bottom bar: align to the actual bottom edge, like Telegram. */
+/* Mobile bottom bar: align with the iPhone bottom safe area, like Telegram/GitHub. */
 @media (max-width:899px) {
-  body nav.tabs {
+  html body nav.tabs {
     position: fixed !important;
     top: auto !important;
     left: 12px !important;
     right: 12px !important;
-    bottom: 0 !important;
+    bottom: max(2px, calc(env(safe-area-inset-bottom, 0px) - 18px)) !important;
     margin: 0 !important;
     transform: none !important;
     width: auto !important;
