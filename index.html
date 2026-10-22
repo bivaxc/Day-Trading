@@ -325,6 +325,47 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   <li>Not proven yet. The plan comes from one winning trade, so test it on small trades first.</li>
   <li>This app is a planning tool, not financial advice.</li></ul></section>
 </div>
+<div id="t-mtf" role="tabpanel" hidden>
+  <div class="hero">
+    <h1>4H → 1H → 15M → 5M</h1>
+    <p class="tag">Independent multi-timeframe liquidity and market-structure strategy. This is separate from the Floor Bounce Method.</p>
+  </div>
+  <section>
+    <h2>Strategy workflow</h2>
+    <p class="hint">Follow the timeframes in order. This setup does not require a floor-bounce candle; it requires its own liquidity and structure confirmations.</p>
+    <div class="step"><div class="num">1</div><div><h3>4H — Direction <span class="pill">H4</span></h3><p>Identify the broader structure. Higher highs and higher lows favour bullish setups; lower highs and lower lows favour bearish setups. If the direction is unclear, stand aside.</p></div></div>
+    <div class="step"><div class="num">2</div><div><h3>1H — Liquidity <span class="pill">H1</span></h3><p>Mark equal highs (EQH), equal lows (EQL), and clear swing points. Watch for price to sweep a level. A sweep alone is not an entry signal.</p></div></div>
+    <div class="step"><div class="num">3</div><div><h3>15M — BOS / CHoCH <span class="pill m">M15</span></h3><p>After price interacts with the liquidity area, look for a meaningful Break of Structure (BOS) or Change of Character (CHoCH). Prefer a candle close beyond the relevant swing level.</p></div></div>
+    <div class="step"><div class="num">4</div><div><h3>5M — Place the trade <span class="pill m">M5</span></h3><p>Wait for a pullback or retest and a defined entry trigger that agrees with the 4H direction and 15M confirmation. Put the stop beyond the setup's invalidation point.</p></div></div>
+  </section>
+  <section>
+    <h2>Independent pre-trade checklist</h2>
+    <p class="hint">These checks apply only to the 4H/1H/15M/5M strategy. They do not replace or change the Floor Bounce checklist.</p>
+    <div id="mtfItems" class="checks">
+      <label><input type="checkbox"> 4H direction is clear</label>
+      <label><input type="checkbox"> 1H EQH/EQL or meaningful liquidity levels are marked</label>
+      <label><input type="checkbox"> Price has interacted with the 1H liquidity area; sweep alone is not treated as a signal</label>
+      <label><input type="checkbox"> 15M confirms a meaningful BOS or CHoCH in the intended direction</label>
+      <label><input type="checkbox"> The relevant 15M candle has closed beyond the structure level</label>
+      <label><input type="checkbox"> 5M provides a planned pullback/retest or entry trigger</label>
+      <label><input type="checkbox"> Stop Loss is beyond the setup invalidation point</label>
+      <label><input type="checkbox"> Target is a logical opposing swing/liquidity area and reward justifies risk</label>
+      <label><input type="checkbox"> Spread and major scheduled news have been checked</label>
+    </div>
+    <p id="mtfStatus" class="q">0 of 9 checked. Complete the checks before considering a trade.</p>
+    <button type="button" class="secondary" id="mtfReset">Reset this checklist</button>
+  </section>
+  <section>
+    <h2>Risk and limitations</h2>
+    <ul class="l">
+      <li>Use the existing Calculator if you want to calculate position risk, but enter prices from this strategy's own setup.</li>
+      <li>Do not assume a liquidity sweep guarantees reversal. Price may continue through the level.</li>
+      <li>This is a manual guide. It does not connect to MT5 or automatically detect live BOS, CHoCH or liquidity sweeps.</li>
+      <li>Test the rules on a demo account and record results before risking real money.</li>
+    </ul>
+    <button type="button" id="mtfToCalc">Open Calculator</button>
+  </section>
+</div>
 <div id="t-settings" role="tabpanel" hidden>
   <h1>Settings</h1>
   <section><h2>Appearance</h2>
@@ -338,6 +379,7 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   <button role="tab" data-t="check" aria-selected="false" aria-label="Checklist"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg><span>Checklist</span></button>
   <button role="tab" data-t="calc" aria-selected="false" aria-label="Calculator"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 7.5h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"/></svg><span>Calculator</span></button>
   <button role="tab" data-t="rules" aria-selected="false" aria-label="Rules"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg><span>Rules</span></button>
+  <button role="tab" data-t="mtf" aria-selected="false" aria-label="Multi-timeframe strategy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18l5-6 4 3 7-9"/><path d="M14 6h5v5"/></svg><span>4H Strategy</span></button>
   <button role="tab" data-t="settings" aria-selected="false" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg><span>Settings</span></button>
 </nav>
 <script>
@@ -443,12 +485,24 @@ body{position:fixed;top:0;right:0;bottom:0;left:0;margin:0;overflow-y:auto;overf
   // tabs
   var tabs=document.querySelectorAll('.tabs button');
   function show(t){
-    ['plan','check','calc','rules','settings'].forEach(function(k){$('t-'+k).hidden=(k!==t)});
+    ['plan','check','calc','rules','mtf','settings'].forEach(function(k){$('t-'+k).hidden=(k!==t)});
     Array.prototype.forEach.call(tabs,function(b){b.setAttribute('aria-selected',b.getAttribute('data-t')===t?'true':'false')});
     window.scrollTo(0,0);try{history.replaceState(null,'','#'+t)}catch(e){}
   }
   Array.prototype.forEach.call(tabs,function(b){b.addEventListener('click',function(){show(b.getAttribute('data-t'))})});
-  var h=(location.hash||'').slice(1);if(['plan','check','calc','rules','settings'].indexOf(h)>-1)show(h);
+  var h=(location.hash||'').slice(1);if(['plan','check','calc','rules','mtf','settings'].indexOf(h)>-1)show(h);
+  // Independent 4H strategy checklist; does not share state with Floor Bounce checklist.
+  var mtfBoxes=document.querySelectorAll('#mtfItems input[type="checkbox"]');
+  function mtfStat(){
+    var n=0;Array.prototype.forEach.call(mtfBoxes,function(b){if(b.checked)n++});
+    var s=$('mtfStatus');
+    if(n===mtfBoxes.length){s.className='q pos';s.textContent='All '+mtfBoxes.length+' checks ticked. Verify the chart and calculator; a completed checklist does not guarantee a winning trade.'}
+    else{s.className='q';s.textContent=n+' of '+mtfBoxes.length+' checked. '+(mtfBoxes.length-n)+' remaining.'}
+  }
+  Array.prototype.forEach.call(mtfBoxes,function(b){b.addEventListener('change',mtfStat)});
+  $('mtfReset').addEventListener('click',function(){Array.prototype.forEach.call(mtfBoxes,function(b){b.checked=false});mtfStat()});
+  $('mtfToCalc').addEventListener('click',function(){show('calc')});
+  mtfStat();
   // steps
   var steps=[
    ['Read the trend','H1','Higher highs and higher lows = uptrend, so you only look for buys. If the trend is down or sideways, stay out of buys.'],
